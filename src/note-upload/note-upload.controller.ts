@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CreateNotesDto } from '@/dto/create-notes-dto';
 import { NoteUploadService } from './note-upload.service';
+import { AuthGuard } from '@/guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('note-upload')
 export class NoteUploadController {
   constructor(private noteUploadService: NoteUploadService) {}
