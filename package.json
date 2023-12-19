@@ -27,6 +27,7 @@
     "@planetscale/database": "^1.11.0",
     "cookie-parser": "^1.4.6",
     "drizzle-orm": "^0.29.1",
+    "jsonwebtoken": "^9.0.2",
     "reflect-metadata": "^0.1.13",
     "tesseract.js": "^5.0.3"
   },
