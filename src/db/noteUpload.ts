@@ -3,11 +3,10 @@ import {
   varchar,
   varbinary,
   timestamp,
-  MySqlVarBinary,
 } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm';
 
-export const noteUploads = mysqlTable('NoteUploads', {
+export const noteUploadsTable = mysqlTable('NoteUploads', {
   id: varchar('id', { length: 191 })
     .primaryKey()
     .notNull()
