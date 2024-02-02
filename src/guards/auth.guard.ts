@@ -22,7 +22,6 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest() as ExpressRequest;
     const token = request.cookies.jwt;
 
-    console.log(token);
     if (!token) {
       return false;
     }
@@ -30,10 +29,9 @@ export class AuthGuard implements CanActivate {
     try {
       const response = jwt.verify(
         token,
-        this.getPublicKey(process.env['CLERK_JWT_VERIFICATION_KEY']),
+        this.getPublicKey(process.env.CLERK_JWT_VERIFICATION_KEY),
       ) as jwt.JwtPayload;
-
-      console.log(response.userId);
+      request.user = { id: response.userId, fullName: response.userFullName };
     } catch (e) {
       console.error(e);
       return false;
