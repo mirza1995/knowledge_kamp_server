@@ -1,6 +1,7 @@
 import { notebookTable } from '@/db/notebook';
 import { CreateNotebookDto } from '@/dto/notebook/create-notebook-dto';
 import { Notebook } from '@/dto/notebook/notebook-dto';
+import { UpdateNotebookDto } from '@/dto/notebook/update-notebook-dto';
 import { DB, DbType } from '@/global/providers/db.provider';
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
@@ -26,7 +27,7 @@ export class NotebookService {
     const notebooks = await this.db
       .select()
       .from(notebookTable)
-      .where(and(eq(notebookTable.userId, userId)));
+      .where(eq(notebookTable.userId, userId));
 
     return notebooks.map((notebook) => Notebook.toDTO(notebook));
   }
@@ -37,5 +38,26 @@ export class NotebookService {
     await this.db.insert(notebookTable).values({ id, userId, ...notebookDto });
 
     return this.getNotebook(id, userId);
+  }
+
+  async updateNotebook(
+    id: string,
+    userId: string,
+    notebookDto: UpdateNotebookDto,
+  ) {
+    await this.db
+      .update(notebookTable)
+      .set(notebookDto)
+      .where(and(eq(notebookTable.id, id), eq(notebookTable.userId, userId)));
+
+    return this.getNotebook(id, userId);
+  }
+
+  async deleteNotebook(id: string, userId: string) {
+    await this.db
+      .delete(notebookTable)
+      .where(and(eq(notebookTable.id, id), eq(notebookTable.userId, userId)));
+
+    return true;
   }
 }
