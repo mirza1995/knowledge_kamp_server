@@ -5,7 +5,6 @@ import { UpdateNotebookDto } from '@/dto/notebook/update-notebook-dto';
 import { DB, DbType } from '@/global/providers/db.provider';
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class NotebookService {
@@ -33,11 +32,12 @@ export class NotebookService {
   }
 
   async createNotebook(notebookDto: CreateNotebookDto, userId: string) {
-    const id: string = uuid();
+    const newNotebook = await this.db
+      .insert(notebookTable)
+      .values({ userId, ...notebookDto })
+      .returning();
 
-    await this.db.insert(notebookTable).values({ id, userId, ...notebookDto });
-
-    return this.getNotebook(id, userId);
+    return Notebook.toDTO(newNotebook[0]);
   }
 
   async updateNotebook(

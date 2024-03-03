@@ -1,7 +1,6 @@
 import { noteUploadsTable } from '@/db/noteUpload';
 import { DB, DbType } from '@/global/providers/db.provider';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
 import { createWorker, Scheduler, createScheduler } from 'tesseract.js';
 
 @Injectable()
@@ -25,7 +24,7 @@ export class NoteUploadService {
     await scheduler.terminate();
   }
 
-  createNoteUploads(texts: string[]): Promise<MySqlRawQueryResult> {
+  createNoteUploads(texts: string[]) {
     return this.db
       .insert(noteUploadsTable)
       .values(texts.map((text) => ({ text })));

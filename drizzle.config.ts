@@ -3,7 +3,7 @@ import type { Config } from 'drizzle-kit';
 export default {
   schema: './src/db/*.ts',
   dbCredentials: {
-    uri: process.env['DATABASE_URI'],
+    connectionString: process.env.DATABASE_URL,
   },
-  driver: 'mysql2',
+  driver: 'pg',
 } satisfies Config;

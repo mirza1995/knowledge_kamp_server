@@ -1,11 +1,10 @@
 import { FactoryProvider, Logger } from '@nestjs/common';
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
-import { connect } from '@planetscale/database';
-import { MySql2Database } from 'drizzle-orm/mysql2';
+import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { ConfigService } from '@nestjs/config';
+import postgres from 'postgres';
 
 export const DB = Symbol('DB_SERVICE');
-export type DbType = MySql2Database;
+export type DbType = PostgresJsDatabase;
 
 export const DbProvider: FactoryProvider = {
   provide: DB,
@@ -13,16 +12,16 @@ export const DbProvider: FactoryProvider = {
   useFactory: (configService: ConfigService) => {
     const logger = new Logger('DB');
 
-    logger.debug('Connecting to PlanetScale...');
+    logger.debug('Connecting to Supabase...');
 
-    const connection = connect({
-      host: configService.get('DATABASE_HOST'),
-      username: configService.get('DATABASE_USERNAME'),
-      password: configService.get('DATABASE_PASSWORD'),
-    });
+    const connectionString = configService.get('DATABASE_URL');
 
-    logger.debug('Connected to PlanetScale!');
+    // Disable prefetch as it is not supported for "Transaction" pool mode
+    const client = postgres(connectionString, { prepare: false });
+    const db = drizzle(client);
 
-    return drizzle(connection);
+    logger.debug('Connected to Supabase!');
+
+    return db;
   },
 };
