@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   UseGuards,
@@ -55,7 +57,16 @@ export class NotebookController {
   }
 
   @Delete('/:id')
-  deleteNotebook(@User() user: User, @Param() params: NotebookIdParam) {
-    return this.notebookService.deleteNotebook(params.id, user.id);
+  async deleteNotebook(@User() user: User, @Param() params: NotebookIdParam) {
+    const deleted = await this.notebookService.deleteNotebook(
+      params.id,
+      user.id,
+    );
+
+    if (deleted) {
+      return deleted;
+    }
+
+    throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
   }
 }

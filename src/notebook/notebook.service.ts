@@ -54,10 +54,11 @@ export class NotebookService {
   }
 
   async deleteNotebook(id: string, userId: string) {
-    await this.db
+    const deletedNotebook = await this.db
       .delete(notebookTable)
-      .where(and(eq(notebookTable.id, id), eq(notebookTable.userId, userId)));
+      .where(and(eq(notebookTable.id, id), eq(notebookTable.userId, userId)))
+      .returning();
 
-    return true;
+    return !!deletedNotebook;
   }
 }
