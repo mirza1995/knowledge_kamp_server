@@ -3,6 +3,9 @@ import { GlobalModule } from '@/global/global.module';
 import { NoteUploadModule } from './note-upload/note-upload.module';
 import { ConfigModule } from '@nestjs/config';
 import { NotebookModule } from './notebook/notebook.module';
+import { NotesController } from './notes/notes.controller';
+import { NotesService } from './notes/notes.service';
+import { NotesModule } from './notes/notes.module';
 
 @Global()
 @Module({
@@ -11,6 +14,9 @@ import { NotebookModule } from './notebook/notebook.module';
     GlobalModule,
     NoteUploadModule,
     NotebookModule,
+    NotesModule,
   ],
+  controllers: [NotesController],
+  providers: [NotesService],
 })
 export class AppModule {}
