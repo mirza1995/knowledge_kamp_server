@@ -6,6 +6,7 @@ import { NotebookModule } from './notebook/notebook.module';
 import { NotesController } from './notes/notes.controller';
 import { NotesService } from './notes/notes.service';
 import { NotesModule } from './notes/notes.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Global()
 @Module({
@@ -15,6 +16,7 @@ import { NotesModule } from './notes/notes.module';
     NoteUploadModule,
     NotebookModule,
     NotesModule,
+    UploadsModule,
   ],
   controllers: [NotesController],
   providers: [NotesService],

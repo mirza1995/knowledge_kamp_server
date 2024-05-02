@@ -1,13 +1,16 @@
-import { pgTable, varchar, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, varchar, timestamp, text } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+import { uploadsTable } from './uploads';
 
 export const noteUploadsTable = pgTable('NoteUploads', {
-  id: varchar('id', { length: 191 })
+  id: varchar('id', { length: 36 })
     .primaryKey()
     .notNull()
     .default(sql`(uuid_generate_v4())`),
-  //todo - add notebookId
-  text: varchar('text', { length: 10_000 }),
+  text: text('text'),
+  uploadId: varchar('upload_id', { length: 36 })
+    .notNull()
+    .references(() => uploadsTable.id, { onDelete: 'cascade' }),
   dateCreated: timestamp('date_created').defaultNow(),
-  dateUpdated: timestamp('date_updated').defaultNow(),
+  userId: varchar('user_id', { length: 32 }).notNull(),
 });
