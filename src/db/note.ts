@@ -14,6 +14,6 @@ export const noteTable = pgTable('Note', {
   lastNotification: timestamp('last_notification').defaultNow(),
   notebookId: varchar('notebook_id', { length: 36 })
     .notNull()
-    .references(() => notebookTable.id),
+    .references(() => notebookTable.id, { onDelete: 'cascade' }),
   userId: varchar('user_id', { length: 32 }).notNull(),
 });
