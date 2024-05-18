@@ -1,10 +1,13 @@
 import { noteUploadsTable } from '@/db/noteUpload';
 import { NoteUploadDTO } from '@/dto/noteUploads/note-upload-dto';
+import { SaveNoteUploadsToNotebookDTO } from '@/dto/noteUploads/save-note-uploads-to-notebook-dto';
+import { UpdateNoteUploadDTO } from '@/dto/noteUploads/update-note-upload-dto';
 import { DB, DbType } from '@/global/providers/db.provider';
 import { UploadsService } from '@/uploads/uploads.service';
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { Inject, Injectable } from '@nestjs/common';
+import { and, eq, inArray } from 'drizzle-orm';
 import { createWorker, Scheduler, createScheduler } from 'tesseract.js';
+import { NotesService } from '@/notes/notes.service';
 
 @Injectable()
 export class NoteUploadService {
@@ -12,6 +15,7 @@ export class NoteUploadService {
   constructor(
     @Inject(DB) private readonly db: DbType,
     private readonly uploadsService: UploadsService,
+    private readonly notesService: NotesService,
   ) {}
 
   async createNotesUpload(userId: string, urls: string[], uploadId: string) {
@@ -42,6 +46,61 @@ export class NoteUploadService {
     return uploadedNotes.map((uploadedNote) =>
       NoteUploadDTO.toDTO(uploadedNote),
     );
+  }
+
+  async updateNoteUpload(
+    noteUploadId: string,
+    userId: string,
+    updateNoteUploadDto: UpdateNoteUploadDTO,
+  ) {
+    const updatedNoteUpload = await this.db
+      .update(noteUploadsTable)
+      .set(updateNoteUploadDto)
+      .where(
+        and(
+          eq(noteUploadsTable.id, noteUploadId),
+          eq(noteUploadsTable.userId, userId),
+        ),
+      )
+      .returning();
+
+    return updatedNoteUpload[0];
+  }
+
+  async saveNoteUploadsToNotebook(
+    userId: string,
+    saveNoteUploadsToNotebookDto: SaveNoteUploadsToNotebookDTO,
+  ) {
+    const newNotes = await this.notesService.createNotes(
+      saveNoteUploadsToNotebookDto.noteUploads.map((noteUpload) => ({
+        content: noteUpload.text,
+      })),
+      saveNoteUploadsToNotebookDto.notebookId,
+      userId,
+    );
+
+    await this.deleteNoteUploads(
+      saveNoteUploadsToNotebookDto.noteUploads.map(
+        (noteUpload) => noteUpload.id,
+      ),
+      userId,
+    );
+
+    return newNotes;
+  }
+
+  async deleteNoteUploads(noteUploadIds: string[], userId: string) {
+    const deletedNoteUpload = await this.db
+      .delete(noteUploadsTable)
+      .where(
+        and(
+          inArray(noteUploadsTable.id, noteUploadIds),
+          eq(noteUploadsTable.userId, userId),
+        ),
+      )
+      .returning();
+
+    return !!deletedNoteUpload;
   }
 
   private async createNoteUploads(

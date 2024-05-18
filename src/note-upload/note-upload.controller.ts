@@ -7,6 +7,9 @@ import { UploadsService } from '@/uploads/uploads.service';
 import { UploadIdParam } from '@/types/uploads/UploadIdParam';
 import { NoteUploadDTO } from '@/dto/noteUploads/note-upload-dto';
 import { UploadDTO } from '@/dto/uploads/upload-dto';
+import { NoteUploadIdParam } from '@/types/noteUploads/NoteUploadIdParam';
+import { UpdateNoteUploadDTO } from '@/dto/noteUploads/update-note-upload-dto';
+import { SaveNoteUploadsToNotebookDTO } from '@/dto/noteUploads/save-note-uploads-to-notebook-dto';
 
 @UseGuards(AuthGuard)
 @Controller('notes-upload')
@@ -40,5 +43,29 @@ export class NoteUploadController {
     );
 
     return UploadDTO.toDTO(upload);
+  }
+
+  @Post('/save-to-notebook')
+  saveNoteUploadsToNotebook(
+    @User() user: User,
+    @Body() saveNoteUploadsToNotebook: SaveNoteUploadsToNotebookDTO,
+  ) {
+    return this.noteUploadService.saveNoteUploadsToNotebook(
+      user.id,
+      saveNoteUploadsToNotebook,
+    );
+  }
+
+  @Post('/:id')
+  updateNotebook(
+    @User() user: User,
+    @Body() updateNoteUploadDto: UpdateNoteUploadDTO,
+    @Param() params: NoteUploadIdParam,
+  ) {
+    return this.noteUploadService.updateNoteUpload(
+      params.id,
+      user.id,
+      updateNoteUploadDto,
+    );
   }
 }

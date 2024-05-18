@@ -48,6 +48,19 @@ export class NotesService {
     return Note.toDTO(newNote[0]);
   }
 
+  async createNotes(
+    notes: CreateNoteDto[],
+    notebookId: string,
+    userId: string,
+  ) {
+    const newNotes = await this.db
+      .insert(noteTable)
+      .values(notes.map((note) => ({ ...note, notebookId, userId })))
+      .returning();
+
+    return newNotes.map((newNote) => Note.toDTO(newNote));
+  }
+
   async updateNote(
     id: string,
     userId: string,
