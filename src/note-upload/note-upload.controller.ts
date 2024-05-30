@@ -10,6 +10,7 @@ import { UploadDTO } from '@/dto/uploads/upload-dto';
 import { NoteUploadIdParam } from '@/types/noteUploads/NoteUploadIdParam';
 import { UpdateNoteUploadDTO } from '@/dto/noteUploads/update-note-upload-dto';
 import { SaveNoteUploadsToNotebookDTO } from '@/dto/noteUploads/save-note-uploads-to-notebook-dto';
+import { CombineNoteUploadsDTO } from '@/dto/noteUploads/combine-note-uploads-dto';
 
 @UseGuards(AuthGuard)
 @Controller('notes-upload')
@@ -56,8 +57,21 @@ export class NoteUploadController {
     );
   }
 
+  @Post('/:id/combine')
+  combineNoteUploads(
+    @User() user: User,
+    @Body() combineNoteUploadsDto: CombineNoteUploadsDTO,
+    @Param() params: NoteUploadIdParam,
+  ) {
+    return this.noteUploadService.combineNoteUploads(
+      params.id,
+      user.id,
+      combineNoteUploadsDto,
+    );
+  }
+
   @Post('/:id')
-  updateNotebook(
+  updateNoteUpload(
     @User() user: User,
     @Body() updateNoteUploadDto: UpdateNoteUploadDTO,
     @Param() params: NoteUploadIdParam,

@@ -5,9 +5,10 @@ import { UpdateNoteUploadDTO } from '@/dto/noteUploads/update-note-upload-dto';
 import { DB, DbType } from '@/global/providers/db.provider';
 import { UploadsService } from '@/uploads/uploads.service';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { createWorker, Scheduler, createScheduler } from 'tesseract.js';
 import { NotesService } from '@/notes/notes.service';
+import { CombineNoteUploadsDTO } from '@/dto/noteUploads/combine-note-uploads-dto';
 
 @Injectable()
 export class NoteUploadService {
@@ -41,7 +42,8 @@ export class NoteUploadService {
           eq(noteUploadsTable.uploadId, uploadId),
           eq(noteUploadsTable.userId, userId),
         ),
-      );
+      )
+      .orderBy(desc(noteUploadsTable.dateCreated));
 
     return uploadedNotes.map((uploadedNote) =>
       NoteUploadDTO.toDTO(uploadedNote),
@@ -89,6 +91,24 @@ export class NoteUploadService {
     return newNotes;
   }
 
+  async combineNoteUploads(
+    uploadId: string,
+    userId: string,
+    combineNoteUploadsDto: CombineNoteUploadsDTO,
+  ) {
+    return this.db.transaction(async () => {
+      const newNoteUpload = await this.createNoteUpload(
+        combineNoteUploadsDto.text,
+        uploadId,
+        userId,
+      );
+
+      await this.deleteNoteUploads(combineNoteUploadsDto.noteUploadIds, userId);
+
+      return newNoteUpload[0];
+    });
+  }
+
   async deleteNoteUploads(noteUploadIds: string[], userId: string) {
     const deletedNoteUpload = await this.db
       .delete(noteUploadsTable)
@@ -101,6 +121,13 @@ export class NoteUploadService {
       .returning();
 
     return !!deletedNoteUpload;
+  }
+
+  async createNoteUpload(text: string, uploadId: string, userId: string) {
+    return await this.db
+      .insert(noteUploadsTable)
+      .values({ text, uploadId, userId })
+      .returning();
   }
 
   private async createNoteUploads(
