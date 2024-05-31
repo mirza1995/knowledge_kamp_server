@@ -11,6 +11,7 @@ import { NoteUploadIdParam } from '@/types/noteUploads/NoteUploadIdParam';
 import { UpdateNoteUploadDTO } from '@/dto/noteUploads/update-note-upload-dto';
 import { SaveNoteUploadsToNotebookDTO } from '@/dto/noteUploads/save-note-uploads-to-notebook-dto';
 import { CombineNoteUploadsDTO } from '@/dto/noteUploads/combine-note-uploads-dto';
+import { DeleteNoteUploadsDTO } from '@/dto/noteUploads/delete-note-uploads-dto';
 
 @UseGuards(AuthGuard)
 @Controller('notes-upload')
@@ -67,6 +68,17 @@ export class NoteUploadController {
       params.id,
       user.id,
       combineNoteUploadsDto,
+    );
+  }
+
+  @Post('/:id/delete')
+  deleteNoteUploads(
+    @User() user: User,
+    @Body() deleteNoteUploadsDto: DeleteNoteUploadsDTO,
+  ) {
+    return this.noteUploadService.deleteNoteUploads(
+      deleteNoteUploadsDto.noteUploadIds,
+      user.id,
     );
   }
 

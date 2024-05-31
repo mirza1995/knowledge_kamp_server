@@ -4,7 +4,7 @@ import { Notebook } from '@/dto/notebook/notebook-dto';
 import { UpdateNotebookDto } from '@/dto/notebook/update-notebook-dto';
 import { DB, DbType } from '@/global/providers/db.provider';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, desc } from 'drizzle-orm';
 
 @Injectable()
 export class NotebookService {
@@ -26,7 +26,8 @@ export class NotebookService {
     const notebooks = await this.db
       .select()
       .from(notebookTable)
-      .where(eq(notebookTable.userId, userId));
+      .where(eq(notebookTable.userId, userId))
+      .orderBy(desc(notebookTable.dateUpdated));
 
     return notebooks.map((notebook) => Notebook.toDTO(notebook));
   }
@@ -47,7 +48,7 @@ export class NotebookService {
   ) {
     await this.db
       .update(notebookTable)
-      .set(notebookDto)
+      .set({ ...notebookDto, dateUpdated: new Date() })
       .where(and(eq(notebookTable.id, id), eq(notebookTable.userId, userId)));
 
     return this.getNotebook(id, userId);

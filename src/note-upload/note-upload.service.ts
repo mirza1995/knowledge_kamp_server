@@ -157,6 +157,10 @@ export class NoteUploadService {
 
   private async generateWorker(scheduler: Scheduler) {
     const worker = await createWorker(NoteUploadService.languages);
+    await worker.setParameters({
+      tessedit_char_whitelist:
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzćčžšđ/' '",
+    });
     scheduler.addWorker(worker);
   }
 }

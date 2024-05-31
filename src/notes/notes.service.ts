@@ -4,7 +4,7 @@ import { Note } from '@/dto/notes/note-dto';
 import { UpdateNoteDto } from '@/dto/notes/update-note-dto';
 import { DB, DbType } from '@/global/providers/db.provider';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, desc } from 'drizzle-orm';
 
 @Injectable()
 export class NotesService {
@@ -34,7 +34,8 @@ export class NotesService {
       .from(noteTable)
       .where(
         and(eq(noteTable.notebookId, notebookId), eq(noteTable.userId, userId)),
-      );
+      )
+      .orderBy(desc(noteTable.dateUpdated));
 
     return notes.map((note) => Note.toDTO(note));
   }
@@ -69,7 +70,10 @@ export class NotesService {
   ) {
     const updatedNotes = await this.db
       .update(noteTable)
-      .set(noteDto)
+      .set({
+        ...noteDto,
+        dateUpdated: new Date(),
+      })
       .where(
         and(
           eq(noteTable.id, id),
