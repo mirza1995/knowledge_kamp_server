@@ -40,7 +40,7 @@ export class NotebookController {
     @User() user: User,
     @Body() createNotebookDto: CreateNotebookDto,
   ) {
-    return this.notebookService.createNotebook(createNotebookDto, user.id);
+    return this.notebookService.createNotebook(createNotebookDto, user);
   }
 
   @Post('/:id')

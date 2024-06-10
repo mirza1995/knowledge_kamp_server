@@ -4,7 +4,7 @@ import { Note } from '@/dto/notes/note-dto';
 import { UpdateNoteDto } from '@/dto/notes/update-note-dto';
 import { DB, DbType } from '@/global/providers/db.provider';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, desc } from 'drizzle-orm';
+import { and, eq, desc, inArray } from 'drizzle-orm';
 
 @Injectable()
 export class NotesService {
@@ -84,6 +84,14 @@ export class NotesService {
       .returning();
 
     return Note.toDTO(updatedNotes[0]);
+  }
+
+  async updateNotesLastNotificationDate(ids: string[]) {
+    const todaysDate = new Date();
+    return this.db
+      .update(noteTable)
+      .set({ lastNotification: todaysDate })
+      .where(inArray(noteTable.id, ids));
   }
 
   async deleteNote(id: string, notebookId: string, userId: string) {

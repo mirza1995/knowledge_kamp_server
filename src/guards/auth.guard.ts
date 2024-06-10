@@ -31,7 +31,11 @@ export class AuthGuard implements CanActivate {
         token,
         this.getPublicKey(process.env.CLERK_JWT_VERIFICATION_KEY),
       ) as jwt.JwtPayload;
-      request.user = { id: response.userId, fullName: response.userFullName };
+      request.user = {
+        id: response.userId,
+        fullName: response.userFullName,
+        email: response.userEmail,
+      };
     } catch (e) {
       console.error(e);
       return false;

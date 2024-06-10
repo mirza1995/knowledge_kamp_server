@@ -3,12 +3,16 @@ import { CreateNotebookDto } from '@/dto/notebook/create-notebook-dto';
 import { Notebook } from '@/dto/notebook/notebook-dto';
 import { UpdateNotebookDto } from '@/dto/notebook/update-notebook-dto';
 import { DB, DbType } from '@/global/providers/db.provider';
+import { UsersService } from '@/users/users.service';
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, desc } from 'drizzle-orm';
 
 @Injectable()
 export class NotebookService {
-  constructor(@Inject(DB) private readonly db: DbType) {}
+  constructor(
+    @Inject(DB) private readonly db: DbType,
+    private readonly usersService: UsersService,
+  ) {}
 
   async getNotebook(id: string, userId: string) {
     const notebook = await this.db
@@ -32,11 +36,13 @@ export class NotebookService {
     return notebooks.map((notebook) => Notebook.toDTO(notebook));
   }
 
-  async createNotebook(notebookDto: CreateNotebookDto, userId: string) {
+  async createNotebook(notebookDto: CreateNotebookDto, user: User) {
     const newNotebook = await this.db
       .insert(notebookTable)
-      .values({ userId, ...notebookDto })
+      .values({ userId: user.id, ...notebookDto })
       .returning();
+
+    await this.usersService.saveUserIfNotPresent(user);
 
     return Notebook.toDTO(newNotebook[0]);
   }
