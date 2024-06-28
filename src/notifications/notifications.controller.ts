@@ -21,7 +21,6 @@ export class NotificationsController {
   async updateNotesLastNotificationDate(
     @Body() notesDto: UpdateNotesLastNotificationDateDTO,
   ) {
-    console.log(notesDto.key, process.env.EMAIL_SEND_API_KEY);
     if (notesDto.key === process.env.EMAIL_SEND_API_KEY) {
       await this.notificationsService.updateNotesLastNotificationDate(notesDto);
 
