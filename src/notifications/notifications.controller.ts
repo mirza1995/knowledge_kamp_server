@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
-  Post,
+  Param,
+  Query,
 } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { SendNotificationsDTO } from '@/dto/notifications/send-notification-dto';
@@ -12,9 +14,9 @@ import { SendNotificationsDTO } from '@/dto/notifications/send-notification-dto'
 export class NotificationsController {
   constructor(private notificationsService: NotificationsService) {}
 
-  @Post()
-  async sendNotifications(@Body() sendNotificationsDto: SendNotificationsDTO) {
-    if (sendNotificationsDto.key === process.env.EMAIL_SEND_API_KEY) {
+  @Get()
+  async sendNotifications(@Query() params: SendNotificationsDTO) {
+    if (params.key === process.env.EMAIL_SEND_API_KEY) {
       await this.notificationsService.sendNotifications();
 
       return { message: 'Success' };
