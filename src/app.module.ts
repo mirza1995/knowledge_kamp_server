@@ -7,9 +7,7 @@ import { NotesController } from './notes/notes.controller';
 import { NotesService } from './notes/notes.service';
 import { NotesModule } from './notes/notes.module';
 import { UploadsModule } from './uploads/uploads.module';
-import { NotificationsController } from './notifications/notifications.controller';
 import { NotificationsModule } from './notifications/notifications.module';
-import { NotificationsService } from './notifications/notifications.service';
 import { UsersModule } from './users/users.module';
 
 @Global()
@@ -24,7 +22,7 @@ import { UsersModule } from './users/users.module';
     NotificationsModule,
     UsersModule,
   ],
-  controllers: [NotesController, NotificationsController],
-  providers: [NotesService, NotificationsService],
+  controllers: [NotesController],
+  providers: [NotesService],
 })
 export class AppModule {}

@@ -6,23 +6,16 @@ import {
   Post,
 } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
-import { UpdateNotesLastNotificationDateDTO } from '@/dto/notifications/update-notes-last-notification-date-dto';
+import { SendNotificationsDTO } from '@/dto/notifications/send-notification-dto';
 
 @Controller('notifications')
 export class NotificationsController {
   constructor(private notificationsService: NotificationsService) {}
 
   @Post()
-  getNotesNotificationsContent() {
-    return this.notificationsService.getNotesNotificationsContent();
-  }
-
-  @Post('/update')
-  async updateNotesLastNotificationDate(
-    @Body() notesDto: UpdateNotesLastNotificationDateDTO,
-  ) {
-    if (notesDto.key === process.env.EMAIL_SEND_API_KEY) {
-      await this.notificationsService.updateNotesLastNotificationDate(notesDto);
+  async sendNotifications(@Body() sendNotificationsDto: SendNotificationsDTO) {
+    if (sendNotificationsDto.key === process.env.EMAIL_SEND_API_KEY) {
+      await this.notificationsService.sendNotifications();
 
       return { message: 'Success' };
     }
